@@ -1,7 +1,12 @@
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { createMockSupabaseClient, isMockDbEnabled } from '@/lib/mock';
 
 export function createSupabaseServer() {
+  // The in-memory database lives in the browser, so server-side calls (the
+  // /logout route) get a client that succeeds and does nothing.
+  if (isMockDbEnabled()) return createMockSupabaseClient();
+
   const cookieStore = cookies();
 
   return createServerClient(
